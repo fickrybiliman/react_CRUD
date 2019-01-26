@@ -27,8 +27,12 @@ class KonstituenCreate extends Component {
   }
 
   _handleSubmit = (e) => {
+    const token = localStorage.getItem('token')
+    const headers = {
+        token : token
+    }
     const { nama, nik, hp, alamat, kecamatanID, kelurahanID, tps } = this.state
-    axios.post('http://localhost:5000/konstituens', { nama, nik, hp,  alamat, kecamatanID, kelurahanID, tps})
+    axios.post('http://localhost:5000/konstituens', { nama, nik, hp,  alamat, kecamatanID, kelurahanID, tps}, { headers })
       .then(res => {
         // console.log(res)
         // Cara redirect react router

@@ -15,7 +15,11 @@ class Konstituen extends Component {
    }
 
    _getDataKonstituen = () => {
-      axios.get('http://localhost:5000/konstituens')
+      const token = localStorage.getItem('token')
+      const headers = {
+         token : token
+      }
+      axios.get('http://localhost:5000/konstituens', { headers })
          .then(res => {
             // console.log(res)
             this.setState({ konstituens : res.data.data })
@@ -25,8 +29,12 @@ class Konstituen extends Component {
 
    _handleDelete = (id, nama) => {
       // alert(id)
+      const token = localStorage.getItem('token')
+      const headers = {
+         token : token
+      }
       const deletedNama = nama;
-      axios.delete(`http://localhost:5000/konstituens/${id}`)
+      axios.delete(`http://localhost:5000/konstituens/${id}`, { headers })
          .then(res => {
             alert(`Berhasil hapus data konstituen dengan nama ${deletedNama}`)
             this._getDataKonstituen();

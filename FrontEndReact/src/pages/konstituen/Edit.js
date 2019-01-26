@@ -32,8 +32,12 @@ class KonstituenEdit extends Component {
 
   _getDataKonstituen = () => {
     // console.log(this.props)
+    const token = localStorage.getItem('token')
+    const headers = {
+        token : token
+    }
     const konstituenId = this.props.match.params.id;
-    axios.get(`http://localhost:5000/konstituens/${konstituenId}`)
+    axios.get(`http://localhost:5000/konstituens/${konstituenId}`, { headers })
     .then(res => {
       // console.log(res)
       const { nama, nik, hp, alamat, kecamatanID, kelurahanID, tps } = res.data.data
@@ -51,9 +55,13 @@ class KonstituenEdit extends Component {
   }
 
   _handleSubmit = (e) => {
+    const token = localStorage.getItem('token')
+    const headers = {
+        token : token
+    }
     const konstituenId = this.props.match.params.id;
     const { nama, nik, hp, alamat, kecamatanID, kelurahanID, tps } = this.state
-    axios.put(`http://localhost:5000/konstituens/${konstituenId}`, { nama, nik, hp,  alamat, kecamatanID, kelurahanID, tps })
+    axios.put(`http://localhost:5000/konstituens/${konstituenId}`, { nama, nik, hp,  alamat, kecamatanID, kelurahanID, tps }, { headers })
       .then(res => {
         // console.log(res)
         // Cara redirect react router

@@ -3,18 +3,19 @@ var router = express.Router();
 
 const models = require('../models');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 //middlewares for check express-session
-const { checkAuthSession } = require('../middlewares/auth');
+const { checkAuth } = require('../middlewares/auth');
 
 /* GET users listing. */
-router.get('/', checkAuthSession, function(req, res, next) {
+router.get('/', checkAuth, function(req, res, next) {
    models.User.findAll().then(users => {
       // console.log(users);
-      res.render('auth/index', {user: users});
+      res.status(200).json({ message : 'Read Data Users'});
    }).catch(err => {
       console.log(err);
-      res.render('auth/index');
+      res.status(403).json({ message : 'Gagal Baca Data Users'});
    })
 });
 
@@ -33,20 +34,18 @@ router.post('/login', (req, res, next) => {
       if (user != null) {
          const checkPassword = bcrypt.compareSync(password, user.password);
          if (checkPassword === true) {
-         req.session.user = {
-            username: user.username
-         }
-         res.redirect('/konstituens');
+            const token = jwt.sign({ user : user }, 'secret key')
+            res.status(200).json({ message : 'Success Login', data : { token }})
          } else {
-         res.redirect('/users/login');
+            res.status(403).json({ message : 'Invalid Login' })
          }
       } else {
-         res.redirect('/users/login');
+         res.status(403).json({ message : "Invalid Login" })
       }
    })
 });
 
-router.get('/add', (req, res, next) => {
+router.get('/add', checkAuth, (req, res, next) => {
    models.User.findAll().then(users => {
       res.render('auth/registrasi', {user: users})
    }).catch(err => {
@@ -55,7 +54,7 @@ router.get('/add', (req, res, next) => {
    })
 });
 
-router.post('/add', (req, res, next) => {
+router.post('/add', checkAuth, (req, res, next) => {
    let {username, password} = req.body;
    password = bcrypt.hashSync(password, 7);
    models.User.create({username, password}).then(user => {
@@ -77,7 +76,7 @@ router.get('/logout', (req, res, next) => {
    })
 });
 
-router.get('/edit/:id', (req, res, next) => {
+router.get('/edit/:id', checkAuth, (req, res, next) => {
    const userId = req.params.id;
    models.User.findOne({where: {id: userId}}).then(user => {
       res.render('auth/edit', {user: user});
@@ -87,7 +86,7 @@ router.get('/edit/:id', (req, res, next) => {
    })
 });
 
-router.post('/edit/:id', (req, res, next) => {
+router.post('/edit/:id', checkAuth, (req, res, next) => {
    const userId = req.params.id;
    let {username, password} = req.body;
    password = bcrypt.hashSync(password, 7);
@@ -104,7 +103,7 @@ router.post('/edit/:id', (req, res, next) => {
    })
 });
 
-router.get('/delete/:id', (req, res, next) => {
+router.get('/delete/:id', checkAuth, (req, res, next) => {
    const userId = req.params.id;
    models.User.findOne({where: {id: userId}}).then(user => {
       return user.destroy();

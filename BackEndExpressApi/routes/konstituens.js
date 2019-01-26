@@ -2,11 +2,11 @@ var express = require('express');
 var router = express.Router();
 const models = require('../models');
 
-//middlewares for check express-session
-// const { checkAuthSession } = require('../middlewares/auth');
+//middlewares for check jwt
+const { checkAuth } = require('../middlewares/auth');
 
 // router.get('/', checkAuthSession, function(req, res, next) {
-router.get('/', function(req, res, next) {
+router.get('/', checkAuth, function(req, res, next) {
    models.Konstituen.findAll({include: [{model: models.Kecamatan}, {model: models.Kelurahan}]})
       .then(konstituens => {
          // console.log(konstituens)
@@ -23,7 +23,7 @@ router.get('/', function(req, res, next) {
 });
 
 // Untuk proses edit, ambil data sesuai ID
-router.get('/:id', function(req, res, next) {
+router.get('/:id', checkAuth, function(req, res, next) {
    const konstituenId = req.params.id;
    models.Konstituen.findOne({where: {id : konstituenId}}, {include: [{model: models.Kecamatan}, {model: models.Kelurahan}]})
       .then(konstituens => {
@@ -41,7 +41,7 @@ router.get('/:id', function(req, res, next) {
 });
 
 
-router.post('/', (req, res, next) => {
+router.post('/', checkAuth, (req, res, next) => {
    const {nama, nik, hp, alamat, kecamatanID, kelurahanID, tps} = req.body;
    models.Konstituen.create({nama, nik, hp, alamat, kecamatanID, kelurahanID, tps})
       .then(konstituen => {
@@ -54,7 +54,7 @@ router.post('/', (req, res, next) => {
 });
 
 
-router.put('/:id', (req, res, next) => {
+router.put('/:id', checkAuth, (req, res, next) => {
    const konstituenId = req.params.id;
    const {nama, nik, hp, alamat, kecamatanID, kelurahanID, tps} = req.body;
    models.Konstituen.findOne({where: {id: konstituenId}})
@@ -78,7 +78,7 @@ router.put('/:id', (req, res, next) => {
       })
 });
 
-router.delete('/:id', (req, res, next) => {
+router.delete('/:id', checkAuth, (req, res, next) => {
    const konstituenId = req.params.id;
    models.Konstituen.findOne({where: {id: konstituenId}})
       .then(konstituen => {
